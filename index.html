@@ -39,14 +39,13 @@
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2">
                     <span id="current-date-text" class="text-sm font-semibold text-slate-300"></span>
-                    <span id="badge-routine-type" class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">8일 루틴 진행 중</span>
+                    <span id="badge-routine-type" class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">3분할 진행 중</span>
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-center">
                     <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
                         <p class="text-xs text-slate-400">오늘의 회복 점수</p>
                         <p id="dash-score" class="text-2xl font-black text-amber-400 mt-1">⭐ - / 10</p>
                     </div>
-                    <!-- 클릭하여 체중 직접 수정 가능 -->
                     <div onclick="promptWeightChange()" class="bg-slate-900/60 p-3 rounded-lg border border-slate-800 cursor-pointer hover:border-emerald-500 transition-all">
                         <p class="text-xs text-slate-400">오늘 체중 (터치하여 수정)</p>
                         <p id="dash-weight" class="text-2xl font-bold text-slate-100 mt-1">--.- kg</p>
@@ -89,21 +88,16 @@
             </div>
 
             <button onclick="toggleModal('modal-home-config')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold py-3 rounded-xl transition-all text-xs flex items-center justify-center">
-                <i class="fa-solid fa-pen-to-square mr-2 text-emerald-400"></i>목표 / 분할 방식 / 탄단지 직접 수정하기
+                <i class="fa-solid fa-pen-to-square mr-2 text-emerald-400"></i>목표 / 분할 개수 / 탄단지 직접 수정하기
             </button>
         </section>
 
         <!-- 🏋️ 2. 운동 기록 탭 -->
         <section id="tab-workout" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-base font-bold text-emerald-400 flex items-center"><i class="fa-solid fa-fire mr-2"></i>오늘 운동 세션</h2>
-                    <button onclick="addNewCustomRoutineOption()" class="text-xs bg-slate-700 text-slate-200 border border-slate-600 px-2 py-1 rounded hover:bg-slate-600">
-                        <i class="fa-solid fa-plus mr-1"></i>분할 항목 추가
-                    </button>
-                </div>
+                <h2 class="text-base font-bold text-emerald-400 flex items-center"><i class="fa-solid fa-fire mr-2"></i>오늘 운동 세션</h2>
 
-                <!-- 세정 / 세션 번호 및 운동 회차 -->
+                <!-- 세션 번호 및 운동 회차 (커스텀 분할 수와 일치) -->
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">현재 세션 번호</label>
@@ -113,19 +107,20 @@
                             <option value="세션 3">세션 3</option>
                             <option value="세션 4">세션 4</option>
                             <option value="세션 5">세션 5</option>
+                            <option value="세션 6">세션 6</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">오늘 운동 회차</label>
                         <select id="workout-day-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100">
-                            <!-- JS로 동적 할당됨 -->
+                            <!-- 설정한 분할 수만큼만 동적 할당됨 -->
                         </select>
                     </div>
                 </div>
 
-                <!-- 쉬는시간 타이머 (개선항목) -->
+                <!-- 휴식 타이머 -->
                 <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs">
-                    <span class="text-slate-400"><i class="fa-solid fa-stopwatch text-emerald-400 mr-1"></i>세트 간 휴식 타이머</span>
+                    <span class="text-slate-400"><i class="fa-solid fa-stopwatch text-emerald-400 mr-1"></i>휴식 타이머</span>
                     <div class="space-x-1">
                         <button onclick="startTimer(60)" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-[11px] hover:text-emerald-400">60초</button>
                         <button onclick="startTimer(90)" class="bg-slate-800 border border-slate-700 px-2 py-1 rounded text-[11px] hover:text-emerald-400">90초</button>
@@ -156,7 +151,7 @@
 
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">운동 상세 메모 (종목 / 중량 x 횟수)</label>
-                    <textarea id="workout-details" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none" placeholder="예:&#10;인클라인 덤벨프레스 28kg 10회 4세트&#10;벤치프레스 80kg 8회 4세트"></textarea>
+                    <textarea id="workout-details" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none" placeholder="예:&#10;벤치프레스 80kg 8회 4세트&#10;인클라인 덤벨프레스 28kg 10회 3세트"></textarea>
                 </div>
 
                 <div class="flex items-center space-x-4 pt-1">
@@ -277,7 +272,7 @@
             </div>
         </section>
 
-        <!-- 📊 6. 전체 데이터 기록 & 세션별 그룹 탭 -->
+        <!-- 📊 6. 전체 데이터 기록 탭 -->
         <section id="tab-history" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
                 <div class="flex justify-between items-center">
@@ -288,27 +283,37 @@
                     </div>
                 </div>
 
-                <!-- 세션별 그룹 영역 -->
                 <div id="history-sessions-container" class="space-y-4"></div>
             </div>
         </section>
 
     </main>
 
-    <!-- 🛠️ 홈 목표 수정 모달 -->
+    <!-- 🛠️ 홈 목표 & 분할 수 설정 모달 (업데이트됨) -->
     <div id="modal-home-config" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 w-full max-w-md space-y-4">
-            <h3 class="font-bold text-base text-emerald-400 flex items-center"><i class="fa-solid fa-sliders mr-2"></i>목표 및 분할 방식 직접 설정</h3>
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 class="font-bold text-base text-emerald-400 flex items-center"><i class="fa-solid fa-sliders mr-2"></i>목표 및 분할 수 직접 설정</h3>
             
             <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-slate-400 mb-1">분할 방식 명칭</label>
-                    <input type="text" id="cfg-routine-name" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="8일 루틴 진행 중">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-slate-400 mb-1">분할 방식 수 (숫자)</label>
+                        <input type="number" min="1" max="12" id="cfg-split-count" onchange="generateDayInputFields(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 font-bold text-center" value="3">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">D-Day 목표 날짜</label>
+                        <input type="date" id="cfg-target-date" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="2026-12-23">
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">D-Day 목표 날짜</label>
-                    <input type="date" id="cfg-target-date" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="2026-12-23">
+
+                <!-- 분할 수만큼 동적 생성되는 각 Day별 이름 입력란 -->
+                <div class="border-t border-b border-slate-700/80 py-2 space-y-2">
+                    <p class="font-bold text-emerald-400 text-[11px]">각 Day별 운동 부위/이름 입력</p>
+                    <div id="day-inputs-container" class="space-y-2">
+                        <!-- JS 동적 생성 -->
+                    </div>
                 </div>
+
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-slate-400 mb-1">목표 골격근량 (kg)</label>
@@ -373,9 +378,10 @@
     </nav>
 
     <script>
-        // 기본 목표 설정
+        // 기본 목표 및 커스텀 분할 설정
         let appConfig = JSON.parse(localStorage.getItem('app_config')) || {
-            routineName: "8일 루틴 진행 중",
+            splitCount: 3,
+            dayList: ["Day 1: 밀기 (Push)", "Day 2: 당기기 (Pull)", "Day 3: 하체 (Legs)"],
             targetDate: "2026-12-23",
             targetSmm: "40",
             targetPbf: "10",
@@ -384,22 +390,9 @@
             fat: "60"
         };
 
-        // 커스텀 운동 분할 항목 목록
-        let routineOptions = JSON.parse(localStorage.getItem('routine_options')) || [
-            "Day 1: 4분할 - 가슴",
-            "Day 2: 4분할 - 등",
-            "Day 3: 4분할 - 어깨",
-            "Day 4: 4분할 - 하체",
-            "Day 5: 완전 휴식 (OFF)",
-            "Day 6: 3분할 - Push (밀기)",
-            "Day 7: 3분할 - Pull (당기기)",
-            "Day 8: 3분할 - Legs (하체) & 복근",
-            "Day 9: 완전 휴식 (OFF)"
-        ];
-
         let mealsList = JSON.parse(localStorage.getItem('meals_list')) || [
-            { id: 1, name: "식사 1 (아침)", memo: "", img: "" },
-            { id: 2, name: "식사 2 (점심)", memo: "", img: "" }
+            { id: 1, name: "식사 1 (아침)", memo: "" },
+            { id: 2, name: "식사 2 (점심)", memo: "" }
         ];
 
         let suppsList = JSON.parse(localStorage.getItem('supps_list')) || [
@@ -411,7 +404,90 @@
 
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
 
-        // 홈 체중 터치 수정
+        // 분할 수(숫자)에 따라 설정창 내 Day 입력칸 생성
+        function generateDayInputFields(count) {
+            const container = document.getElementById('day-inputs-container');
+            container.innerHTML = '';
+            const c = Math.max(1, Math.min(Number(count) || 1, 12));
+            
+            for (let i = 0; i < c; i++) {
+                const defaultVal = appConfig.dayList && appConfig.dayList[i] ? appConfig.dayList[i] : `Day ${i + 1}: 부위 입력`;
+                container.innerHTML += `
+                    <div class="flex items-center space-x-2">
+                        <span class="text-slate-400 font-bold w-12 text-[10px]">Day ${i + 1}</span>
+                        <input type="text" id="cfg-day-input-${i}" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-slate-100 text-xs" value="${defaultVal}">
+                    </div>
+                `;
+            }
+        }
+
+        // 설정 저장
+        function saveHomeConfig() {
+            const splitCount = Number(document.getElementById('cfg-split-count').value) || 3;
+            const newDayList = [];
+            for (let i = 0; i < splitCount; i++) {
+                const el = document.getElementById(`cfg-day-input-${i}`);
+                if (el) newDayList.push(el.value);
+            }
+
+            appConfig = {
+                splitCount: splitCount,
+                dayList: newDayList,
+                targetDate: document.getElementById('cfg-target-date').value,
+                targetSmm: document.getElementById('cfg-target-smm').value,
+                targetPbf: document.getElementById('cfg-target-pbf').value,
+                carb: document.getElementById('cfg-carb').value,
+                protein: document.getElementById('cfg-protein').value,
+                fat: document.getElementById('cfg-fat').value
+            };
+            
+            localStorage.setItem('app_config', JSON.stringify(appConfig));
+            applyAppConfig();
+            renderWorkoutDayOptions();
+            toggleModal('modal-home-config');
+            alert('분할 구성 및 설정이 적용되었습니다!');
+        }
+
+        // 설정 화면 반영
+        function applyAppConfig() {
+            const targetDate = new Date(appConfig.targetDate);
+            const today = new Date();
+            const diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('d-day-tag').innerText = diffDays >= 0 ? `D-${diffDays}` : `D+${Math.abs(diffDays)}`;
+            document.getElementById('header-sub').innerText = `목표: 체지방 ${appConfig.targetPbf}% | 골격근 ${appConfig.targetSmm}kg`;
+            document.getElementById('badge-routine-type').innerText = `${appConfig.splitCount}분할 진행 중`;
+
+            document.getElementById('lbl-target-carb').innerText = appConfig.carb;
+            document.getElementById('lbl-target-protein').innerText = appConfig.protein;
+            document.getElementById('lbl-target-fat').innerText = appConfig.fat;
+
+            document.getElementById('input-carb').value = appConfig.carb;
+            document.getElementById('input-protein').value = appConfig.protein;
+            document.getElementById('input-fat').value = appConfig.fat;
+
+            document.getElementById('cfg-split-count').value = appConfig.splitCount;
+            document.getElementById('cfg-target-date').value = appConfig.targetDate;
+            document.getElementById('cfg-target-smm').value = appConfig.targetSmm;
+            document.getElementById('cfg-target-pbf').value = appConfig.targetPbf;
+            document.getElementById('cfg-carb').value = appConfig.carb;
+            document.getElementById('cfg-protein').value = appConfig.protein;
+            document.getElementById('cfg-fat').value = appConfig.fat;
+
+            generateDayInputFields(appConfig.splitCount);
+            updateNutrientBars();
+        }
+
+        // 운동 탭 드롭다운에 설정된 분할 수만큼만 렌더링
+        function renderWorkoutDayOptions() {
+            const select = document.getElementById('workout-day-select');
+            select.innerHTML = '';
+            appConfig.dayList.forEach(dayName => {
+                select.innerHTML += `<option value="${dayName}">${dayName}</option>`;
+            });
+        }
+
+        // 홈 체중 수정
         function promptWeightChange() {
             const currentW = document.getElementById('dash-weight').innerText.replace(' kg', '');
             const newW = prompt("오늘 체중을 입력하세요 (kg):", currentW !== '--.-' ? currentW : '81.9');
@@ -419,24 +495,6 @@
                 document.getElementById('dash-weight').innerText = `${newW} kg`;
                 document.getElementById('input-weight').value = newW;
             }
-        }
-
-        // 분할 항목 추가 기능
-        function addNewCustomRoutineOption() {
-            const newOpt = prompt("새로 추가할 운동 분할 명칭을 입력하세요:", "Day 10: 어깨 & 팔 집중");
-            if (newOpt) {
-                routineOptions.push(newOpt);
-                localStorage.setItem('routine_options', JSON.stringify(routineOptions));
-                renderRoutineSelectOptions();
-            }
-        }
-
-        function renderRoutineSelectOptions() {
-            const select = document.getElementById('workout-day-select');
-            select.innerHTML = '';
-            routineOptions.forEach(opt => {
-                select.innerHTML += `<option value="${opt}">${opt}</option>`;
-            });
         }
 
         // 타이머 기능
@@ -457,44 +515,7 @@
             }, 1000);
         }
 
-        // 설정 저장
-        function saveHomeConfig() {
-            appConfig = {
-                routineName: document.getElementById('cfg-routine-name').value,
-                targetDate: document.getElementById('cfg-target-date').value,
-                targetSmm: document.getElementById('cfg-target-smm').value,
-                targetPbf: document.getElementById('cfg-target-pbf').value,
-                carb: document.getElementById('cfg-carb').value,
-                protein: document.getElementById('cfg-protein').value,
-                fat: document.getElementById('cfg-fat').value
-            };
-            localStorage.setItem('app_config', JSON.stringify(appConfig));
-            applyAppConfig();
-            toggleModal('modal-home-config');
-            alert('설정이 저장되었습니다!');
-        }
-
-        function applyAppConfig() {
-            const targetDate = new Date(appConfig.targetDate);
-            const today = new Date();
-            const diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
-            
-            document.getElementById('d-day-tag').innerText = diffDays >= 0 ? `D-${diffDays}` : `D+${Math.abs(diffDays)}`;
-            document.getElementById('header-sub').innerText = `목표: 체지방 ${appConfig.targetPbf}% | 골격근 ${appConfig.targetSmm}kg`;
-            document.getElementById('badge-routine-type').innerText = appConfig.routineName;
-
-            document.getElementById('lbl-target-carb').innerText = appConfig.carb;
-            document.getElementById('lbl-target-protein').innerText = appConfig.protein;
-            document.getElementById('lbl-target-fat').innerText = appConfig.fat;
-
-            document.getElementById('input-carb').value = appConfig.carb;
-            document.getElementById('input-protein').value = appConfig.protein;
-            document.getElementById('input-fat').value = appConfig.fat;
-
-            updateNutrientBars();
-        }
-
-        // 세션별 데이터 그룹화 및 과거 기록 수정 기능
+        // 세션별 데이터 그룹화 및 히스토리
         function renderHistorySessions() {
             const container = document.getElementById('history-sessions-container');
             container.innerHTML = '';
@@ -509,7 +530,6 @@
                 return;
             }
 
-            // 세션별 그룹화
             const grouped = {};
             logs.forEach(log => {
                 const sName = log.sessionNum || "세션 1";
@@ -549,7 +569,6 @@
             });
         }
 
-        // 과거 기록 수정
         function editPastLog(dateStr) {
             const log = JSON.parse(localStorage.getItem(`log_${dateStr}`));
             if (!log) return;
@@ -567,7 +586,7 @@
             renderHistorySessions();
         }
 
-        // 식사 및 영양제 관리
+        // 식사 & 영양제 관리
         function renderMeals() {
             const container = document.getElementById('meals-container');
             container.innerHTML = '';
@@ -584,7 +603,7 @@
             });
         }
 
-        function addMealBlock() { mealsList.push({ id: Date.now(), name: `식사 ${mealsList.length + 1}`, memo: "", img: "" }); saveMeals(); }
+        function addMealBlock() { mealsList.push({ id: Date.now(), name: `식사 ${mealsList.length + 1}`, memo: "" }); saveMeals(); }
         function removeMealBlock(id) { mealsList = mealsList.filter(m => m.id !== id); saveMeals(); }
         function updateMealName(id, val) { const m = mealsList.find(x => x.id === id); if(m) m.name = val; saveMeals(); }
         function updateMealMemo(id, val) { const m = mealsList.find(x => x.id === id); if(m) m.memo = val; saveMeals(); }
@@ -610,7 +629,6 @@
         function removeSuppBlock(id) { suppsList = suppsList.filter(s => s.id !== id); saveSupps(); }
         function saveSupps() { localStorage.setItem('supps_list', JSON.stringify(suppsList)); renderSupps(); }
 
-        // 데이터 백업 및 복구
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
             const dlAnchorElem = document.createElement('a');
@@ -625,7 +643,7 @@
                 try {
                     const parsed = JSON.parse(jsonStr);
                     Object.keys(parsed).forEach(k => localStorage.setItem(k, parsed[k]));
-                    alert("데이터가 berhasil 복구되었습니다!");
+                    alert("데이터가 성공적으로 복구되었습니다!");
                     location.reload();
                 } catch(e) {
                     alert("올바르지 않은 JSON 데이터입니다.");
@@ -700,7 +718,7 @@
             document.getElementById('dash-weight').innerText = `${data.weight} kg`;
             updateNutrientBars();
 
-            alert('오늘의 데이터가成功적으로 저장되었습니다!');
+            alert('오늘의 데이터가 성공적으로 저장되었습니다!');
             switchTab('dashboard');
         });
 
@@ -709,7 +727,7 @@
         document.getElementById('current-date-text').innerText = new Date().toLocaleDateString('ko-KR', options);
 
         applyAppConfig();
-        renderRoutineSelectOptions();
+        renderWorkoutDayOptions();
         renderMeals();
         renderSupps();
     </script>
