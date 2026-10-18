@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>전역 D-Day 근합성 일지</title>
+    <title>린매스업 & 트레이닝 대시보드</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,6 +11,8 @@
         body { -webkit-tap-highlight-color: transparent; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen pb-24 font-sans">
@@ -19,10 +21,10 @@
     <header class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50 shadow-md">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div>
-                <h1 class="font-bold text-lg text-emerald-400"><i class="fa-solid fa-dumbbell mr-2"></i>12.23 전역 & 린매스업</h1>
-                <p class="text-xs text-slate-400">목표: 체지방 10% | 골격근 40kg</p>
+                <h1 id="header-title" class="font-bold text-lg text-emerald-400"><i class="fa-solid fa-dumbbell mr-2"></i>린매스업 프로젝트</h1>
+                <p id="header-sub" class="text-xs text-slate-400">목표: 골격근 40kg | 체지방 10%</p>
             </div>
-            <div class="text-right">
+            <div>
                 <span id="d-day-tag" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold px-2.5 py-1 rounded-full">D-Day</span>
             </div>
         </div>
@@ -31,17 +33,17 @@
     <!-- 메인 컨테이너 -->
     <main class="max-w-md mx-auto p-4 space-y-6">
 
-        <!-- 🏠 메인 대시보드 탭 -->
+        <!-- 🏠 1. 메인 대시보드 탭 -->
         <section id="tab-dashboard" class="tab-content active space-y-4">
             <!-- 오늘 요약 카드 -->
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2">
                     <span id="current-date-text" class="text-sm font-semibold text-slate-300">2026년 10월 --일</span>
-                    <span class="text-xs bg-slate-700 px-2 py-0.5 rounded text-slate-300">8일 루틴 진행 중</span>
+                    <span id="badge-routine-type" class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">8일 루틴 진행 중</span>
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-center">
                     <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
-                        <p class="text-xs text-slate-400">오늘의 종합 회복 점수</p>
+                        <p class="text-xs text-slate-400">오늘의 회복 점수</p>
                         <p id="dash-score" class="text-2xl font-black text-amber-400 mt-1">⭐ - / 10</p>
                     </div>
                     <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
@@ -53,11 +55,11 @@
 
             <!-- 목표 달성 진행 바 -->
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">목표 매일 섭취율</h3>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">오늘 영양 섭취 진행도</h3>
                 <div class="space-y-2">
                     <div>
                         <div class="flex justify-between text-xs mb-1">
-                            <span>탄수화물 (목표 270g)</span>
+                            <span>탄수화물 (<span id="lbl-target-carb">270</span>g)</span>
                             <span id="carb-status" class="text-emerald-400">0g / 270g</span>
                         </div>
                         <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
@@ -66,7 +68,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-xs mb-1">
-                            <span>단백질 (목표 160g)</span>
+                            <span>단백질 (<span id="lbl-target-protein">160</span>g)</span>
                             <span id="protein-status" class="text-blue-400">0g / 160g</span>
                         </div>
                         <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
@@ -75,7 +77,7 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-xs mb-1">
-                            <span>지방 (목표 60g)</span>
+                            <span>지방 (<span id="lbl-target-fat">60</span>g)</span>
                             <span id="fat-status" class="text-amber-400">0g / 60g</span>
                         </div>
                         <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden">
@@ -84,9 +86,14 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 홈 화면 직접 설정 모달 토글 버튼 -->
+            <button onclick="toggleModal('modal-home-config')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold py-3 rounded-xl transition-all text-xs flex items-center justify-center">
+                <i class="fa-solid fa-pen-to-square mr-2 text-emerald-400"></i>목표 / 분할 방식 / 탄단지 직접 수정하기
+            </button>
         </section>
 
-        <!-- 🏋️ 탭 1: 운동 기록 -->
+        <!-- 🏋️ 2. 운동 기록 탭 -->
         <section id="tab-workout" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
                 <h2 class="text-base font-bold text-emerald-400 flex items-center"><i class="fa-solid fa-fire mr-2"></i>오늘 운동 세션</h2>
@@ -94,15 +101,15 @@
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">오늘 회차 선택</label>
                     <select id="workout-day-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
-                        <option value="Day 1">Day 1: 4분할 - 가슴</option>
-                        <option value="Day 2">Day 2: 4분할 - 등</option>
-                        <option value="Day 3">Day 3: 4분할 - 어깨</option>
-                        <option value="Day 4">Day 4: 4분할 - 하체</option>
-                        <option value="Day 5">Day 5: 완전 휴식 (OFF)</option>
-                        <option value="Day 6">Day 6: 3분할 - Push (밀기)</option>
-                        <option value="Day 7">Day 7: 3분할 - Pull (당기기)</option>
-                        <option value="Day 8">Day 8: 3분할 - Legs (하체) & 복근</option>
-                        <option value="Day 9">Day 9: 완전 휴식 (OFF)</option>
+                        <option value="Day 1 - 가슴">Day 1: 4분할 - 가슴</option>
+                        <option value="Day 2 - 등">Day 2: 4분할 - 등</option>
+                        <option value="Day 3 - 어깨">Day 3: 4분할 - 어깨</option>
+                        <option value="Day 4 - 하체">Day 4: 4분할 - 하체</option>
+                        <option value="Day 5 - 휴식">Day 5: 완전 휴식 (OFF)</option>
+                        <option value="Day 6 - Push">Day 6: 3분할 - Push (밀기)</option>
+                        <option value="Day 7 - Pull">Day 7: 3분할 - Pull (당기기)</option>
+                        <option value="Day 8 - Legs">Day 8: 3분할 - Legs (하체) & 복근</option>
+                        <option value="Day 9 - 휴식">Day 9: 완전 휴식 (OFF)</option>
                     </select>
                 </div>
 
@@ -118,70 +125,78 @@
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">운동 강도 (RPE)</label>
                         <select id="workout-rpe" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-100">
-                            <option value="RPE 8">RPE 8 (적정 근비대 - 여유 2회)</option>
-                            <option value="RPE 9">RPE 9 (고강도 - 여유 1회)</option>
+                            <option value="RPE 8">RPE 8 (적정 근비대)</option>
+                            <option value="RPE 9">RPE 9 (고강도)</option>
                             <option value="RPE 10">RPE 10 (실패 지점)</option>
-                            <option value="RPE 6~7">RPE 6~7 (디로딩/경량)</option>
+                            <option value="RPE 6~7">RPE 6~7 (디로딩)</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">운동 상세 메모 (종목 / 중량 x 횟수)</label>
-                    <textarea id="workout-details" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500" placeholder="예:&#10;인클라인 덤벨프레스 28kg 10회 4세트&#10;벤치프레스 80kg 8회 4세트&#10;케이블 크런치 40kg 15회 3세트"></textarea>
+                    <textarea id="workout-details" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-500" placeholder="예:&#10;인클라인 덤벨프레스 28kg 10회 4세트&#10;벤치프레스 80kg 8회 4세트"></textarea>
                 </div>
 
                 <div class="flex items-center space-x-4 pt-1">
                     <label class="flex items-center space-x-2 text-xs text-slate-300">
-                        <input type="checkbox" id="chk-abs" class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
+                        <input type="checkbox" id="chk-abs" class="rounded bg-slate-900 border-slate-700 text-emerald-500">
                         <span>복근 진행 완료</span>
                     </label>
                     <label class="flex items-center space-x-2 text-xs text-slate-300">
-                        <input type="checkbox" id="chk-cardio" class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
-                        <span>식후 걷기/러닝 완료</span>
+                        <input type="checkbox" id="chk-cardio" class="rounded bg-slate-900 border-slate-700 text-emerald-500">
+                        <span>유산소 완료</span>
                     </label>
                 </div>
             </div>
         </section>
 
-        <!-- 🥗 탭 2: 식단 기록 -->
+        <!-- 🥗 3. 식단 기록 탭 (커스텀 식사 & 사진 업로드 기능) -->
         <section id="tab-diet" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
-                <h2 class="text-base font-bold text-emerald-400 flex items-center"><i class="fa-solid fa-utensils mr-2"></i>식단 및 영양 섭취</h2>
+                <h2 class="text-base font-bold text-emerald-400 flex items-center justify-between">
+                    <span><i class="fa-solid fa-utensils mr-2"></i>식단 및 영양 섭취</span>
+                    <button onclick="addMealBlock()" class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-1 rounded hover:bg-emerald-500/30">
+                        <i class="fa-solid fa-plus mr-1"></i>식사 추가
+                    </button>
+                </h2>
 
                 <div class="grid grid-cols-3 gap-2">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">탄수화물(g)</label>
-                        <input type="number" id="input-carb" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100" placeholder="270" value="270">
+                        <input type="number" id="input-carb" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100" placeholder="270">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">단백질(g)</label>
-                        <input type="number" id="input-protein" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100" placeholder="160" value="160">
+                        <input type="number" id="input-protein" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100" placeholder="160">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">지방(g)</label>
-                        <input type="number" id="input-fat" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100" placeholder="60" value="60">
+                        <input type="number" id="input-fat" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100" placeholder="60">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">오늘 섭취 식단 요약</label>
-                    <textarea id="diet-memo" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none" placeholder="아침: 닭가슴살 볶음밥&#10;점심: 군대 병영식당 일반식&#10;저녁/PX: 프로틴 음료, 바나나"></textarea>
+                <!-- 커스텀 식사 칸 영역 -->
+                <div id="meals-container" class="space-y-3">
+                    <!-- JS로 동적 생성됨 -->
                 </div>
 
-                <div class="border-t border-slate-700 pt-3">
-                    <p class="text-xs font-semibold text-slate-300 mb-2">필수 영양제 체크</p>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <label class="flex items-center space-x-2"><input type="checkbox" id="supp-creatine" class="rounded bg-slate-900 border-slate-700 text-emerald-500"> <span>크레아틴 (5g)</span></label>
-                        <label class="flex items-center space-x-2"><input type="checkbox" id="supp-vitd" class="rounded bg-slate-900 border-slate-700 text-emerald-500"> <span>비타민 D3/K2</span></label>
-                        <label class="flex items-center space-x-2"><input type="checkbox" id="supp-omega" class="rounded bg-slate-900 border-slate-700 text-emerald-500"> <span>오메가3 (1000mg)</span></label>
-                        <label class="flex items-center space-x-2"><input type="checkbox" id="supp-mag" class="rounded bg-slate-900 border-slate-700 text-emerald-500"> <span>마그네슘 (2알)</span></label>
+                <!-- 커스텀 영양제 칸 영역 -->
+                <div class="border-t border-slate-700 pt-3 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <p class="text-xs font-semibold text-slate-300">필수 영양제 체크</p>
+                        <button onclick="addSuppBlock()" class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded hover:bg-slate-600">
+                            <i class="fa-solid fa-plus mr-1"></i>영양제 추가
+                        </button>
+                    </div>
+                    <div id="supps-container" class="grid grid-cols-2 gap-2 text-xs">
+                        <!-- JS로 동적 생성됨 -->
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 🧠 탭 3: 컨디션 & 회복 -->
+        <!-- 🧠 4. 컨디션 & 회복 탭 -->
         <section id="tab-condition" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
                 <h2 class="text-base font-bold text-emerald-400 flex items-center"><i class="fa-solid fa-heart-pulse mr-2"></i>컨디션 & 회복 상태</h2>
@@ -208,23 +223,33 @@
 
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">몸 상태 / 근육통 부위 노트</label>
-                    <input type="text" id="input-body-note" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600" placeholder="예: 하체 근육통 약간 남음, 어깨 피로감 적음">
+                    <input type="text" id="input-body-note" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600" placeholder="예: 하체 근육통 남아있음">
                 </div>
             </div>
         </section>
 
-        <!-- ⭐ 탭 4: 종합 점수 및 저장 -->
+        <!-- ⭐ 5. 종합 점수 및 컨디션 비교 탭 -->
         <section id="tab-score" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4 text-center">
-                <h2 class="text-base font-bold text-emerald-400"><i class="fa-solid fa-star mr-2"></i>오늘 하루 근합성 종합 점수</h2>
+                <h2 class="text-base font-bold text-emerald-400"><i class="fa-solid fa-star mr-2"></i>오늘 하루 근합성 점수</h2>
                 
                 <div class="py-2">
                     <span id="score-display" class="text-4xl font-black text-amber-400">8 점</span>
                     <input type="range" id="input-score" min="1" max="10" value="8" class="w-full mt-4 accent-emerald-500">
-                    <div class="flex justify-between text-[10px] text-slate-500 mt-1">
-                        <span>1점 (최악)</span>
-                        <span>5점 (보통)</span>
-                        <span>10점 (최상의 근합성)</span>
+                </div>
+
+                <!-- 컨디션 점수 비교 카드 -->
+                <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700/80 text-left space-y-2">
+                    <p class="text-xs font-bold text-slate-300"><i class="fa-solid fa-chart-line mr-1 text-emerald-400"></i>컨디션 점수 흐름 비교</p>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-slate-800 p-2 rounded border border-slate-700">
+                            <p class="text-[10px] text-slate-400">어제 점수</p>
+                            <p id="cmp-score-yesterday" class="text-sm font-bold text-slate-200">기록 없음</p>
+                        </div>
+                        <div class="bg-slate-800 p-2 rounded border border-slate-700">
+                            <p class="text-[10px] text-slate-400">이전 동일 세션 점수</p>
+                            <p id="cmp-score-prev-session" class="text-sm font-bold text-emerald-400">기록 없음</p>
+                        </div>
                     </div>
                 </div>
 
@@ -238,45 +263,298 @@
             </div>
         </section>
 
+        <!-- 📊 6. 전체 데이터 히스토리 (가로 나열 세션 비교 탭) -->
+        <section id="tab-history" class="tab-content space-y-4">
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <h2 class="text-base font-bold text-emerald-400"><i class="fa-solid fa-clock-rotate-left mr-2"></i>전체 세션 비교 기록</h2>
+                <p class="text-xs text-slate-400">각 세션별 저장 데이터를 가로로 스크롤하여 변화를 비교해보세요.</p>
+                
+                <!-- 가로 스크롤 카드 컨테이너 -->
+                <div id="history-scroll-container" class="flex space-x-3 overflow-x-auto no-scrollbar py-2">
+                    <!-- JS로 전체 세션 데이터가 가로로 채워짐 -->
+                </div>
+            </div>
+        </section>
+
     </main>
+
+    <!-- 🛠️ 홈 화면 목표 직접 수정 모달 (팝업창) -->
+    <div id="modal-home-config" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 w-full max-w-md space-y-4">
+            <h3 class="font-bold text-base text-emerald-400 flex items-center"><i class="fa-solid fa-sliders mr-2"></i>목표 및 분할 방식 직접 설정</h3>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-400 mb-1">분할 방식 명칭</label>
+                    <input type="text" id="cfg-routine-name" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="8일 루틴 진행 중">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1">목표 전역일/D-Day 날짜</label>
+                    <input type="date" id="cfg-target-date" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="2026-12-23">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-slate-400 mb-1">목표 골격근량 (kg)</label>
+                        <input type="number" step="0.1" id="cfg-target-smm" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="40">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">목표 체지방률 (%)</label>
+                        <input type="number" step="0.1" id="cfg-target-pbf" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="10">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-slate-400 mb-1">목표 탄수화물(g)</label>
+                        <input type="number" id="cfg-carb" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-center text-slate-100" value="270">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">목표 단백질(g)</label>
+                        <input type="number" id="cfg-protein" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-center text-slate-100" value="160">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">목표 지방(g)</label>
+                        <input type="number" id="cfg-fat" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-center text-slate-100" value="60">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 pt-2">
+                <button onclick="toggleModal('modal-home-config')" class="w-1/2 bg-slate-700 text-slate-300 py-2.5 rounded-lg text-xs font-bold">취소</button>
+                <button onclick="saveHomeConfig()" class="w-1/2 bg-emerald-500 text-slate-900 py-2.5 rounded-lg text-xs font-bold">저장하기</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 하단 네비게이션 바 -->
     <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur border-t border-slate-700 p-2 z-50">
-        <div class="max-w-md mx-auto grid grid-cols-5 gap-1 text-center">
-            <button onclick="switchTab('dashboard')" class="nav-btn active p-2 text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-chart-pie text-lg"></i>
-                <span class="text-[10px] mt-1">홈</span>
+        <div class="max-w-md mx-auto grid grid-cols-6 gap-1 text-center">
+            <button onclick="switchTab('dashboard')" class="nav-btn active p-1 text-emerald-400 flex flex-col items-center">
+                <i class="fa-solid fa-chart-pie text-base"></i>
+                <span class="text-[9px] mt-1">홈</span>
             </button>
-            <button onclick="switchTab('workout')" class="nav-btn p-2 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-dumbbell text-lg"></i>
-                <span class="text-[10px] mt-1">운동</span>
+            <button onclick="switchTab('workout')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
+                <i class="fa-solid fa-dumbbell text-base"></i>
+                <span class="text-[9px] mt-1">운동</span>
             </button>
-            <button onclick="switchTab('diet')" class="nav-btn p-2 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-apple-whole text-lg"></i>
-                <span class="text-[10px] mt-1">식단</span>
+            <button onclick="switchTab('diet')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
+                <i class="fa-solid fa-apple-whole text-base"></i>
+                <span class="text-[9px] mt-1">식단</span>
             </button>
-            <button onclick="switchTab('condition')" class="nav-btn p-2 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-notes-medical text-lg"></i>
-                <span class="text-[10px] mt-1">회복</span>
+            <button onclick="switchTab('condition')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
+                <i class="fa-solid fa-notes-medical text-base"></i>
+                <span class="text-[9px] mt-1">회복</span>
             </button>
-            <button onclick="switchTab('score')" class="nav-btn p-2 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-check-to-slot text-lg"></i>
-                <span class="text-[10px] mt-1">점수</span>
+            <button onclick="switchTab('score')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
+                <i class="fa-solid fa-check-to-slot text-base"></i>
+                <span class="text-[9px] mt-1">점수</span>
+            </button>
+            <button onclick="switchTab('history')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
+                <i class="fa-solid fa-timeline text-base"></i>
+                <span class="text-[9px] mt-1">기록</span>
             </button>
         </div>
     </nav>
 
     <script>
-        // 전역 D-Day 계산 (2026년 12월 23일)
-        const dischargeDate = new Date("2026-12-23");
-        const today = new Date();
-        const diffTime = dischargeDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        document.getElementById('d-day-tag').innerText = `전역 D-${diffDays}`;
+        // 목표 설정 객체
+        let appConfig = JSON.parse(localStorage.getItem('app_config')) || {
+            routineName: "8일 루틴 진행 중",
+            targetDate: "2026-12-23",
+            targetSmm: "40",
+            targetPbf: "10",
+            carb: "270",
+            protein: "160",
+            fat: "60"
+        };
 
-        // 오늘 날짜 표시
-        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
-        document.getElementById('current-date-text').innerText = today.toLocaleDateString('ko-KR', options);
+        // 커스텀 식사 및 영양제 목록 관리
+        let mealsList = JSON.parse(localStorage.getItem('meals_list')) || [
+            { id: 1, name: "식사 1 (아침)", memo: "", img: "" },
+            { id: 2, name: "식사 2 (점심)", memo: "", img: "" }
+        ];
+
+        let suppsList = JSON.parse(localStorage.getItem('supps_list')) || [
+            { id: 1, name: "크레아틴 (5g)", checked: false },
+            { id: 2, name: "비타민 D3/K2", checked: false },
+            { id: 3, name: "오메가3 (1000mg)", checked: false },
+            { id: 4, name: "마그네슘 (2알)", checked: false }
+        ];
+
+        // 모달 켜고 끄기
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.toggle('hidden');
+        }
+
+        // 설정 저장
+        function saveHomeConfig() {
+            appConfig = {
+                routineName: document.getElementById('cfg-routine-name').value,
+                targetDate: document.getElementById('cfg-target-date').value,
+                targetSmm: document.getElementById('cfg-target-smm').value,
+                targetPbf: document.getElementById('cfg-target-pbf').value,
+                carb: document.getElementById('cfg-carb').value,
+                protein: document.getElementById('cfg-protein').value,
+                fat: document.getElementById('cfg-fat').value
+            };
+            localStorage.setItem('app_config', JSON.stringify(appConfig));
+            applyAppConfig();
+            toggleModal('modal-home-config');
+            alert('설정이 변경되었습니다!');
+        }
+
+        // 목표 설정 화면 반영
+        function applyAppConfig() {
+            const dischargeDate = new Date(appConfig.targetDate);
+            const today = new Date();
+            const diffDays = Math.ceil((dischargeDate - today) / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('d-day-tag').innerText = diffDays >= 0 ? `전역 D-${diffDays}` : `D+${Math.abs(diffDays)}`;
+            document.getElementById('header-sub').innerText = `목표: 체지방 ${appConfig.targetPbf}% | 골격근 ${appConfig.targetSmm}kg`;
+            document.getElementById('badge-routine-type').innerText = appConfig.routineName;
+
+            document.getElementById('lbl-target-carb').innerText = appConfig.carb;
+            document.getElementById('lbl-target-protein').innerText = appConfig.protein;
+            document.getElementById('lbl-target-fat').innerText = appConfig.fat;
+
+            document.getElementById('input-carb').value = appConfig.carb;
+            document.getElementById('input-protein').value = appConfig.protein;
+            document.getElementById('input-fat').value = appConfig.fat;
+
+            updateNutrientBars();
+        }
+
+        // 식사 추가 및 렌더링
+        function renderMeals() {
+            const container = document.getElementById('meals-container');
+            container.innerHTML = '';
+            mealsList.forEach((m, idx) => {
+                container.innerHTML += `
+                    <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-700/80 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <input type="text" value="${m.name}" onchange="updateMealName(${m.id}, this.value)" class="bg-transparent border-b border-slate-700 font-bold text-xs text-emerald-400 focus:outline-none">
+                            <button onclick="removeMealBlock(${m.id})" class="text-slate-500 hover:text-red-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <textarea rows="2" placeholder="음식 내용 및 칼로리 추적 메모" onchange="updateMealMemo(${m.id}, this.value)" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-slate-100 placeholder-slate-600 focus:outline-none">${m.memo}</textarea>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-[10px] bg-slate-800 border border-slate-700 px-2 py-1 rounded text-slate-300 cursor-pointer">
+                                <i class="fa-solid fa-camera mr-1"></i>사진 첨부
+                                <input type="file" accept="image/*" class="hidden" onchange="handleMealImg(${m.id}, this)">
+                            </label>
+                            ${m.img ? `<img src="${m.img}" class="w-8 h-8 rounded object-cover border border-slate-600">` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addMealBlock() {
+            mealsList.push({ id: Date.now(), name: `식사 ${mealsList.length + 1}`, memo: "", img: "" });
+            saveMeals();
+        }
+
+        function removeMealBlock(id) {
+            mealsList = mealsList.filter(m => m.id !== id);
+            saveMeals();
+        }
+
+        function updateMealName(id, val) { const m = mealsList.find(x => x.id === id); if(m) m.name = val; saveMeals(); }
+        function updateMealMemo(id, val) { const m = mealsList.find(x => x.id === id); if(m) m.memo = val; saveMeals(); }
+        function handleMealImg(id, input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const m = mealsList.find(x => x.id === id);
+                    if(m) m.img = e.target.result;
+                    saveMeals();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function saveMeals() { localStorage.setItem('meals_list', JSON.stringify(mealsList)); renderMeals(); }
+
+        // 영양제 관리
+        function renderSupps() {
+            const container = document.getElementById('supps-container');
+            container.innerHTML = '';
+            suppsList.forEach((s) => {
+                container.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800">
+                        <label class="flex items-center space-x-2 text-slate-300">
+                            <input type="checkbox" ${s.checked ? 'checked' : ''} onchange="toggleSupp(${s.id})" class="rounded bg-slate-800 border-slate-700 text-emerald-500">
+                            <span>${s.name}</span>
+                        </label>
+                        <button onclick="removeSuppBlock(${s.id})" class="text-slate-600 hover:text-red-400"><i class="fa-solid fa-minus"></i></button>
+                    </div>
+                `;
+            });
+        }
+        function addSuppBlock() {
+            const name = prompt("추가할 영양제 이름을 입력하세요:", "비타민 C");
+            if(name) { suppsList.push({ id: Date.now(), name, checked: false }); saveSupps(); }
+        }
+        function toggleSupp(id) { const s = suppsList.find(x => x.id === id); if(s) s.checked = !s.checked; saveSupps(); }
+        function removeSuppBlock(id) { suppsList = suppsList.filter(s => s.id !== id); saveSupps(); }
+        function saveSupps() { localStorage.setItem('supps_list', JSON.stringify(suppsList)); renderSupps(); }
+
+        // 컨디션 비교 로직
+        function updateConditionComparisons() {
+            const currentDay = document.getElementById('workout-day-select').value;
+            const yesterdayDate = new Date();
+            yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+            const yesterdayKey = `log_${yesterdayDate.toISOString().split('T')[0]}`;
+            const yesterdayData = JSON.parse(localStorage.getItem(yesterdayKey));
+
+            document.getElementById('cmp-score-yesterday').innerText = yesterdayData ? `${yesterdayData.score} 점` : '기록 없음';
+
+            // 이전 동일 세션 찾기
+            let prevSessionScore = '기록 없음';
+            const allKeys = Object.keys(localStorage).filter(k => k.startsWith('log_')).sort().reverse();
+            for (let k of allKeys) {
+                const log = JSON.parse(localStorage.getItem(k));
+                if (log.workoutDay === currentDay && log.date !== new Date().toISOString().split('T')[0]) {
+                    prevSessionScore = `${log.score} 점 (${log.date.slice(5)})`;
+                    break;
+                }
+            }
+            document.getElementById('cmp-score-prev-session').innerText = prevSessionScore;
+        }
+
+        // 전체 기록 가로 스크롤 렌더링
+        function renderHistoryScroll() {
+            const container = document.getElementById('history-scroll-container');
+            container.innerHTML = '';
+
+            const logs = Object.keys(localStorage)
+                .filter(k => k.startsWith('log_'))
+                .map(k => JSON.parse(localStorage.getItem(k)))
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (logs.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500 py-4">저장된 데이터가 아직 없습니다.</p>';
+                return;
+            }
+
+            logs.forEach(log => {
+                container.innerHTML += `
+                    <div class="min-w-[220px] max-w-[220px] bg-slate-900 border border-slate-700 p-3 rounded-xl flex-shrink-0 space-y-2 text-xs">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                            <span class="font-bold text-emerald-400">${log.date}</span>
+                            <span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-amber-400 font-bold">⭐ ${log.score}점</span>
+                        </div>
+                        <p class="font-semibold text-slate-200">${log.workoutDay}</p>
+                        <div class="text-[11px] text-slate-400 space-y-1">
+                            <p>⚖️ 체중: <span class="text-slate-200 font-bold">${log.weight} kg</span></p>
+                            <p>🍱 탄/단/지: ${log.carb}g / ${log.protein}g / ${log.fat}g</p>
+                            <p>🏋️ 강도: ${log.rpe || 'RPE 미입력'}</p>
+                        </div>
+                        <div class="bg-slate-800 p-1.5 rounded text-[10px] text-slate-300 max-h-16 overflow-y-auto whitespace-pre-line">
+                            ${log.workoutDetails || '운동 상세 메모 없음'}
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
         // 탭 전환 함수
         function switchTab(tabId) {
@@ -286,62 +564,77 @@
                 el.classList.add('text-slate-400');
             });
 
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            event.currentTarget.classList.remove('text-slate-400');
-            event.currentTarget.classList.add('text-emerald-400');
+            const targetSection = document.getElementById(`tab-${tabId}`);
+            if(targetSection) targetSection.classList.add('active');
+
+            if(event && event.currentTarget && event.currentTarget.classList) {
+                event.currentTarget.classList.remove('text-slate-400');
+                event.currentTarget.classList.add('text-emerald-400');
+            }
+
+            if(tabId === 'history') renderHistoryScroll();
+            if(tabId === 'score') updateConditionComparisons();
         }
 
-        // 슬라이더 바 값 동기화
-        const scoreInput = document.getElementById('input-score');
-        const scoreDisplay = document.getElementById('score-display');
-        scoreInput.addEventListener('input', (e) => {
-            scoreDisplay.innerText = `${e.target.value} 점`;
-        });
-
-        // 식단 영양소 프로그래스바 동기화
+        // 프로그래스바 수치 업데이트
         function updateNutrientBars() {
             const carb = Number(document.getElementById('input-carb').value) || 0;
             const protein = Number(document.getElementById('input-protein').value) || 0;
             const fat = Number(document.getElementById('input-fat').value) || 0;
 
-            document.getElementById('carb-status').innerText = `${carb}g / 270g`;
-            document.getElementById('protein-status').innerText = `${protein}g / 160g`;
-            document.getElementById('fat-status').innerText = `${fat}g / 60g`;
+            const tCarb = Number(appConfig.carb) || 270;
+            const tProtein = Number(appConfig.protein) || 160;
+            const tFat = Number(appConfig.fat) || 60;
 
-            document.getElementById('carb-bar').style.width = `${Math.min((carb / 270) * 100, 100)}%`;
-            document.getElementById('protein-bar').style.width = `${Math.min((protein / 160) * 100, 100)}%`;
-            document.getElementById('fat-bar').style.width = `${Math.min((fat / 60) * 100, 100)}%`;
+            document.getElementById('carb-status').innerText = `${carb}g / ${tCarb}g`;
+            document.getElementById('protein-status').innerText = `${protein}g / ${tProtein}g`;
+            document.getElementById('fat-status').innerText = `${fat}g / ${tFat}g`;
+
+            document.getElementById('carb-bar').style.width = `${Math.min((carb / tCarb) * 100, 100)}%`;
+            document.getElementById('protein-bar').style.width = `${Math.min((protein / tProtein) * 100, 100)}%`;
+            document.getElementById('fat-bar').style.width = `${Math.min((fat / tFat) * 100, 100)}%`;
         }
 
         ['input-carb', 'input-protein', 'input-fat'].forEach(id => {
             document.getElementById(id).addEventListener('input', updateNutrientBars);
         });
 
-        // 데이터 저장 기능 (LocalStorage)
+        document.getElementById('input-score').addEventListener('input', (e) => {
+            document.getElementById('score-display').innerText = `${e.target.value} 점`;
+        });
+
+        // 오늘 데이터 저장
         document.getElementById('btn-save').addEventListener('click', () => {
+            const todayStr = new Date().toISOString().split('T')[0];
             const data = {
-                date: new Date().toISOString().split('T')[0],
+                date: todayStr,
                 weight: document.getElementById('input-weight').value,
                 score: document.getElementById('input-score').value,
                 carb: document.getElementById('input-carb').value,
                 protein: document.getElementById('input-protein').value,
                 fat: document.getElementById('input-fat').value,
                 workoutDay: document.getElementById('workout-day-select').value,
+                rpe: document.getElementById('workout-rpe').value,
                 workoutDetails: document.getElementById('workout-details').value
             };
 
-            localStorage.setItem(`log_${data.date}`, JSON.stringify(data));
+            localStorage.setItem(`log_${todayStr}`, JSON.stringify(data));
             
             document.getElementById('dash-score').innerText = `⭐ ${data.score} / 10`;
             document.getElementById('dash-weight').innerText = `${data.weight} kg`;
             updateNutrientBars();
 
-            alert('오늘의 근합성 일지가 성공적으로 저장되었습니다!');
+            alert('오늘의 데이터가 성공적으로 저장되었습니다!');
             switchTab('dashboard');
         });
 
-        // 초기화 실행
-        updateNutrientBars();
+        // 초기화
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
+        document.getElementById('current-date-text').innerText = new Date().toLocaleDateString('ko-KR', options);
+
+        applyAppConfig();
+        renderMeals();
+        renderSupps();
     </script>
 </body>
 </html>
