@@ -37,7 +37,10 @@
         <section id="tab-dashboard" class="tab-content active space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                    <input type="date" id="select-log-date" onchange="loadDateData(this.value)" class="bg-slate-900 text-slate-100 text-xs font-bold p-1 rounded border border-slate-700 focus:outline-none">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-slate-400">조회/기록 날짜:</span>
+                        <input type="date" id="select-log-date" onchange="loadDateData(this.value)" class="bg-slate-900 text-slate-100 text-xs font-bold p-1 rounded border border-slate-700 focus:outline-none">
+                    </div>
                     <span id="badge-routine-type" class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">3분할 진행 중</span>
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-center">
@@ -52,9 +55,10 @@
                 </div>
             </div>
 
+            <!-- 목표 달성 진행 바 & 일일 합산 영양 정보 -->
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">영양 섭취 진행도</h3>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">오늘 영양 섭취 진행도</h3>
                     <span id="lbl-total-kcal" class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">목표 2,260 kcal</span>
                 </div>
                 <div class="space-y-2">
@@ -93,7 +97,7 @@
             </button>
         </section>
 
-        <!-- 🏋️ 2. 운동 기록 탭 (저번 세션 기록 자동 표시 & 과부하 성공 체크) -->
+        <!-- 🏋️ 2. 운동 기록 탭 -->
         <section id="tab-workout" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
                 <h2 class="text-base font-bold text-emerald-400 flex items-center"><i class="fa-solid fa-fire mr-2"></i>오늘 운동 세션</h2>
@@ -117,7 +121,6 @@
                     </div>
                 </div>
 
-                <!-- 저번 세션 같은 Day의 운동 기록 자동 불러오기 카드 -->
                 <div class="bg-slate-900/90 p-3 rounded-lg border border-emerald-500/30 space-y-1">
                     <p class="text-[11px] font-bold text-emerald-400 flex items-center">
                         <i class="fa-solid fa-clock-rotate-left mr-1"></i>지난 세션 동일 Day 운동 기록
@@ -127,7 +130,6 @@
                     </div>
                 </div>
 
-                <!-- 휴식 타이머 -->
                 <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700 flex justify-between items-center text-xs">
                     <span class="text-slate-400"><i class="fa-solid fa-stopwatch text-emerald-400 mr-1"></i>휴식 타이머</span>
                     <div class="space-x-1">
@@ -163,7 +165,6 @@
                     <textarea id="workout-details" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none" placeholder="중량 및 횟수를 기록하세요"></textarea>
                 </div>
 
-                <!-- 점진적 과부하 체크 칸 추가 -->
                 <div class="bg-emerald-500/10 border border-emerald-500/30 p-2.5 rounded-lg flex items-center justify-between">
                     <label class="flex items-center space-x-2 text-xs text-emerald-300 font-bold cursor-pointer">
                         <input type="checkbox" id="chk-overload" class="rounded bg-slate-900 border-slate-700 text-emerald-500 w-4 h-4">
@@ -184,35 +185,38 @@
             </div>
         </section>
 
-        <!-- 🥗 3. 식단 기록 탭 (음성 인식 기능 지원) -->
+        <!-- 🥗 3. 식단 기록 탭 -->
         <section id="tab-diet" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
                 <h2 class="text-base font-bold text-emerald-400 flex items-center justify-between">
-                    <span><i class="fa-solid fa-utensils mr-2"></i>식단 및 영양 섭취</span>
+                    <span><i class="fa-solid fa-utensils mr-2"></i>식사별 영양 섭취</span>
                     <button onclick="addMealBlock()" class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-1 rounded">
                         <i class="fa-solid fa-plus mr-1"></i>식사 추가
                     </button>
                 </h2>
 
-                <div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">탄수화물(g)</label>
-                            <input type="number" id="input-carb" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100">
+                <div id="meals-container" class="space-y-3"></div>
+
+                <div class="bg-slate-900 p-3.5 rounded-xl border border-emerald-500/40 space-y-2">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold text-emerald-400"><i class="fa-solid fa-calculator mr-1"></i>오늘 총 합산 영양소</span>
+                        <span id="lbl-curr-kcal" class="text-xs font-extrabold text-amber-400">총 0 kcal</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="bg-slate-800 p-2 rounded">
+                            <p class="text-[10px] text-slate-400">합산 탄수화물</p>
+                            <p id="sum-carb-text" class="font-bold text-emerald-400 mt-0.5">0 g</p>
                         </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">단백질(g)</label>
-                            <input type="number" id="input-protein" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100">
+                        <div class="bg-slate-800 p-2 rounded">
+                            <p class="text-[10px] text-slate-400">합산 단백질</p>
+                            <p id="sum-protein-text" class="font-bold text-blue-400 mt-0.5">0 g</p>
                         </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">지방(g)</label>
-                            <input type="number" id="input-fat" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-center text-slate-100">
+                        <div class="bg-slate-800 p-2 rounded">
+                            <p class="text-[10px] text-slate-400">합산 지방</p>
+                            <p id="sum-fat-text" class="font-bold text-amber-400 mt-0.5">0 g</p>
                         </div>
                     </div>
-                    <p id="lbl-curr-kcal" class="text-right text-xs text-amber-400 mt-1 font-bold">현재 섭취 칼로리: 0 kcal</p>
                 </div>
-
-                <div id="meals-container" class="space-y-3"></div>
 
                 <div class="border-t border-slate-700 pt-3 space-y-2">
                     <div class="flex justify-between items-center">
@@ -226,7 +230,7 @@
             </div>
         </section>
 
-        <!-- 🧠 4. 회복 페이지 (운동 전/후 컨디션 5단계 선택 신설) -->
+        <!-- 🧠 4. 회복 페이지 -->
         <section id="tab-condition" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-4">
                 <h2 class="text-base font-bold text-emerald-400 flex items-center"><i class="fa-solid fa-heart-pulse mr-2"></i>컨디션 & 회복 상태</h2>
@@ -242,7 +246,6 @@
                     </div>
                 </div>
 
-                <!-- 운동 전 컨디션 5단계 -->
                 <div class="space-y-1">
                     <label class="block text-xs text-slate-400">⚡ 운동 전 컨디션 (1~5단계)</label>
                     <div class="grid grid-cols-5 gap-1 text-center text-xs">
@@ -254,7 +257,6 @@
                     </div>
                 </div>
 
-                <!-- 운동 후 컨디션 5단계 -->
                 <div class="space-y-1">
                     <label class="block text-xs text-slate-400">🔥 운동 후 회복/피로도 (1~5단계)</label>
                     <div class="grid grid-cols-5 gap-1 text-center text-xs">
@@ -316,7 +318,7 @@
             </div>
         </section>
 
-        <!-- 📊 6. 대대적 개편 기록 페이지 (세션 평균 통계 및 계층형 드릴다운) -->
+        <!-- 📊 6. 기록 조회 탭 (Day 터치 시 해당 날짜 홈으로 바로 이동) -->
         <section id="tab-history" class="tab-content space-y-4">
             <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
                 <div class="flex justify-between items-center">
@@ -327,24 +329,11 @@
                     </div>
                 </div>
 
-                <!-- 계층형 세션 목록 및 평균 통계 표시 영역 -->
                 <div id="history-sessions-container" class="space-y-4"></div>
             </div>
         </section>
 
     </main>
-
-    <!-- 🛠️ 상세 기록 보기 모달 (팝업) -->
-    <div id="modal-log-detail" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 w-full max-w-md space-y-3 max-h-[85vh] overflow-y-auto text-xs">
-            <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-                <h3 id="detail-modal-title" class="font-bold text-sm text-emerald-400">상세 기록</h3>
-                <button onclick="toggleModal('modal-log-detail')" class="text-slate-400"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div id="detail-modal-body" class="space-y-2 text-slate-300"></div>
-            <button onclick="toggleModal('modal-log-detail')" class="w-full bg-slate-700 text-slate-200 font-bold py-2 rounded-lg mt-2">닫기</button>
-        </div>
-    </div>
 
     <!-- 🛠️ 홈 목표 & 분할 수 설정 모달 -->
     <div id="modal-home-config" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
@@ -352,601 +341,4 @@
             <h3 class="font-bold text-base text-emerald-400 flex items-center"><i class="fa-solid fa-sliders mr-2"></i>목표 및 분할 수 직접 설정</h3>
             
             <div class="space-y-3 text-xs">
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-slate-400 mb-1">분할 방식 수 (숫자)</label>
-                        <input type="number" min="1" max="12" id="cfg-split-count" onchange="generateDayInputFields(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 font-bold text-center" value="3">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 mb-1">D-Day 목표 날짜</label>
-                        <input type="date" id="cfg-target-date" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="2026-12-23">
-                    </div>
-                </div>
-
-                <div class="border-t border-b border-slate-700/80 py-2 space-y-2">
-                    <p class="font-bold text-emerald-400 text-[11px]">각 Day별 운동 부위/이름 입력</p>
-                    <div id="day-inputs-container" class="space-y-2"></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-slate-400 mb-1">목표 골격근량 (kg)</label>
-                        <input type="number" step="0.1" id="cfg-target-smm" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="40">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 mb-1">목표 체지방률 (%)</label>
-                        <input type="number" step="0.1" id="cfg-target-pbf" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100" value="10">
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <div>
-                        <label class="block text-slate-400 mb-1">목표 탄수화물(g)</label>
-                        <input type="number" id="cfg-carb" onchange="calcTargetKcal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-center text-slate-100" value="270">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 mb-1">목표 단백질(g)</label>
-                        <input type="number" id="cfg-protein" onchange="calcTargetKcal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-center text-slate-100" value="160">
-                    </div>
-                    <div>
-                        <label class="block text-slate-400 mb-1">목표 지방(g)</label>
-                        <input type="number" id="cfg-fat" onchange="calcTargetKcal()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-center text-slate-100" value="60">
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex space-x-2 pt-2">
-                <button onclick="toggleModal('modal-home-config')" class="w-1/2 bg-slate-700 text-slate-300 py-2.5 rounded-lg text-xs font-bold">취소</button>
-                <button onclick="saveHomeConfig()" class="w-1/2 bg-emerald-500 text-slate-900 py-2.5 rounded-lg text-xs font-bold">저장하기</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 하단 네비게이션 바 -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur border-t border-slate-700 p-2 z-50">
-        <div class="max-w-md mx-auto grid grid-cols-6 gap-1 text-center">
-            <button onclick="switchTab('dashboard')" class="nav-btn active p-1 text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-chart-pie text-base"></i>
-                <span class="text-[9px] mt-1">홈</span>
-            </button>
-            <button onclick="switchTab('workout')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-dumbbell text-base"></i>
-                <span class="text-[9px] mt-1">운동</span>
-            </button>
-            <button onclick="switchTab('diet')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-apple-whole text-base"></i>
-                <span class="text-[9px] mt-1">식단</span>
-            </button>
-            <button onclick="switchTab('condition')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-notes-medical text-base"></i>
-                <span class="text-[9px] mt-1">회복</span>
-            </button>
-            <button onclick="switchTab('score')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-check-to-slot text-base"></i>
-                <span class="text-[9px] mt-1">점수</span>
-            </button>
-            <button onclick="switchTab('history')" class="nav-btn p-1 text-slate-400 hover:text-emerald-400 flex flex-col items-center">
-                <i class="fa-solid fa-timeline text-base"></i>
-                <span class="text-[9px] mt-1">기록</span>
-            </button>
-        </div>
-    </nav>
-
-    <script>
-        let appConfig = JSON.parse(localStorage.getItem('app_config')) || {
-            splitCount: 3,
-            dayList: ["Day 1: 밀기 (Push)", "Day 2: 당기기 (Pull)", "Day 3: 하체 (Legs)"],
-            targetDate: "2026-12-23",
-            targetSmm: "40",
-            targetPbf: "10",
-            carb: "270",
-            protein: "160",
-            fat: "60"
-        };
-
-        let mealsList = JSON.parse(localStorage.getItem('meals_list')) || [
-            { id: 1, name: "식사 1 (아침)", memo: "", img: "" },
-            { id: 2, name: "식사 2 (점심)", memo: "", img: "" }
-        ];
-
-        let suppsList = JSON.parse(localStorage.getItem('supps_list')) || [
-            { id: 1, name: "크레아틴 (5g)", checked: false },
-            { id: 2, name: "비타민 D3/K2", checked: false },
-            { id: 3, name: "오메가3 (1000mg)", checked: false },
-            { id: 4, name: "마그네슘 (2알)", checked: false }
-        ];
-
-        let selectedPreCond = 3;
-        let selectedPostCond = 3;
-
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
-
-        function calculateKcal(c, p, f) {
-            return (Number(c) || 0) * 4 + (Number(p) || 0) * 4 + (Number(f) || 0) * 9;
-        }
-
-        // 저번 세션 동일 Day 운동 기록 불러오기
-        function fetchPreviousDayRecord() {
-            const currentDay = document.getElementById('workout-day-select').value;
-            const currentSession = document.getElementById('workout-session-num').value;
-            const box = document.getElementById('prev-workout-log-box');
-
-            const allLogs = Object.keys(localStorage)
-                .filter(k => k.startsWith('log_'))
-                .map(k => JSON.parse(localStorage.getItem(k)))
-                .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            const match = allLogs.find(l => l.workoutDay === currentDay && l.sessionNum !== currentSession);
-            if (match && match.workoutDetails) {
-                box.innerText = `[${match.date} | ${match.sessionNum}]\n${match.workoutDetails}`;
-            } else {
-                box.innerText = "이전 세션의 동일 Day 기록이 없습니다.";
-            }
-        }
-
-        // 음성 인식 기능 (Web Speech API)
-        function startVoiceRecognition(mealId) {
-            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-                alert("현재 브라우저에서 음성 인식을 지원하지 않습니다. 키보드로 입력해 주세요.");
-                return;
-            }
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ko-KR';
-
-            recognition.onstart = function() {
-                alert("음성 인식이 시작되었습니다. 말씀해 주세요!");
-            };
-
-            recognition.onresult = function(event) {
-                const text = event.results[0][0].transcript;
-                const m = mealsList.find(x => x.id === mealId);
-                if (m) {
-                    m.memo = m.memo ? `${m.memo}\n${text}` : text;
-                    saveMeals();
-                }
-            };
-
-            recognition.onerror = function() {
-                alert("음성을 인식하지 못했습니다. 다시 시도해 주세요.");
-            };
-
-            recognition.start();
-        }
-
-        // 컨디션 5단계 선택
-        function setPreCond(val) {
-            selectedPreCond = val;
-            document.querySelectorAll('.btn-pre-cond').forEach(b => b.classList.remove('border-emerald-500', 'bg-emerald-500/20', 'text-emerald-400'));
-            const target = document.getElementById(`pre-cond-${val}`);
-            if (target) target.classList.add('border-emerald-500', 'bg-emerald-500/20', 'text-emerald-400');
-        }
-
-        function setPostCond(val) {
-            selectedPostCond = val;
-            document.querySelectorAll('.btn-post-cond').forEach(b => b.classList.remove('border-amber-500', 'bg-amber-500/20', 'text-amber-400'));
-            const target = document.getElementById(`post-cond-${val}`);
-            if (target) target.classList.add('border-amber-500', 'bg-amber-500/20', 'text-amber-400');
-        }
-
-        function generateDayInputFields(count) {
-            const container = document.getElementById('day-inputs-container');
-            container.innerHTML = '';
-            const c = Math.max(1, Math.min(Number(count) || 1, 12));
-            for (let i = 0; i < c; i++) {
-                const defaultVal = appConfig.dayList && appConfig.dayList[i] ? appConfig.dayList[i] : `Day ${i + 1}: 부위 입력`;
-                container.innerHTML += `
-                    <div class="flex items-center space-x-2">
-                        <span class="text-slate-400 font-bold w-12 text-[10px]">Day ${i + 1}</span>
-                        <input type="text" id="cfg-day-input-${i}" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-slate-100 text-xs" value="${defaultVal}">
-                    </div>
-                `;
-            }
-        }
-
-        function saveHomeConfig() {
-            const splitCount = Number(document.getElementById('cfg-split-count').value) || 3;
-            const newDayList = [];
-            for (let i = 0; i < splitCount; i++) {
-                const el = document.getElementById(`cfg-day-input-${i}`);
-                if (el) newDayList.push(el.value);
-            }
-
-            appConfig = {
-                splitCount: splitCount,
-                dayList: newDayList,
-                targetDate: document.getElementById('cfg-target-date').value,
-                targetSmm: document.getElementById('cfg-target-smm').value,
-                targetPbf: document.getElementById('cfg-target-pbf').value,
-                carb: document.getElementById('cfg-carb').value,
-                protein: document.getElementById('cfg-protein').value,
-                fat: document.getElementById('cfg-fat').value
-            };
-            
-            localStorage.setItem('app_config', JSON.stringify(appConfig));
-            applyAppConfig();
-            renderWorkoutDayOptions();
-            toggleModal('modal-home-config');
-            alert('설정이 저장되었습니다.');
-        }
-
-        function applyAppConfig() {
-            const targetDate = new Date(appConfig.targetDate);
-            const today = new Date();
-            const diffDays = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
-            
-            document.getElementById('d-day-tag').innerText = diffDays >= 0 ? `D-${diffDays}` : `D+${Math.abs(diffDays)}`;
-            document.getElementById('header-sub').innerText = `목표: 체지방 ${appConfig.targetPbf}% | 골격근 ${appConfig.targetSmm}kg`;
-            document.getElementById('badge-routine-type').innerText = `${appConfig.splitCount}분할 진행 중`;
-
-            document.getElementById('lbl-target-carb').innerText = appConfig.carb;
-            document.getElementById('lbl-target-protein').innerText = appConfig.protein;
-            document.getElementById('lbl-target-fat').innerText = appConfig.fat;
-
-            const targetKcal = calculateKcal(appConfig.carb, appConfig.protein, appConfig.fat);
-            document.getElementById('lbl-total-kcal').innerText = `목표 ${targetKcal.toLocaleString()} kcal`;
-
-            document.getElementById('cfg-split-count').value = appConfig.splitCount;
-            document.getElementById('cfg-target-date').value = appConfig.targetDate;
-            document.getElementById('cfg-target-smm').value = appConfig.targetSmm;
-            document.getElementById('cfg-target-pbf').value = appConfig.targetPbf;
-            document.getElementById('cfg-carb').value = appConfig.carb;
-            document.getElementById('cfg-protein').value = appConfig.protein;
-            document.getElementById('cfg-fat').value = appConfig.fat;
-
-            generateDayInputFields(appConfig.splitCount);
-            updateNutrientBars();
-        }
-
-        function loadDateData(dateStr) {
-            const log = JSON.parse(localStorage.getItem(`log_${dateStr}`));
-            if (log) {
-                document.getElementById('dash-score').innerText = `⭐ ${log.score} / 10`;
-                document.getElementById('dash-weight').innerText = `${log.weight} kg`;
-                document.getElementById('input-weight').value = log.weight;
-                document.getElementById('input-carb').value = log.carb;
-                document.getElementById('input-protein').value = log.protein;
-                document.getElementById('input-fat').value = log.fat;
-                document.getElementById('workout-session-num').value = log.sessionNum || "세션 1";
-                document.getElementById('workout-day-select').value = log.workoutDay || appConfig.dayList[0];
-                document.getElementById('workout-rpe').value = log.rpe || "RPE 8";
-                document.getElementById('workout-details').value = log.workoutDetails || "";
-                document.getElementById('chk-overload').checked = !!log.isOverload;
-                document.getElementById('input-score').value = log.score || 8;
-                document.getElementById('score-display').innerText = `${log.score || 8} 점`;
-                setPreCond(log.preCond || 3);
-                setPostCond(log.postCond || 3);
-            } else {
-                document.getElementById('dash-score').innerText = `⭐ - / 10`;
-                document.getElementById('dash-weight').innerText = `--.- kg`;
-                document.getElementById('input-weight').value = "";
-                document.getElementById('input-carb').value = appConfig.carb;
-                document.getElementById('input-protein').value = appConfig.protein;
-                document.getElementById('input-fat').value = appConfig.fat;
-                document.getElementById('workout-details').value = "";
-                document.getElementById('chk-overload').checked = false;
-                setPreCond(3);
-                setPostCond(3);
-            }
-            updateNutrientBars();
-            fetchPreviousDayRecord();
-        }
-
-        function renderWorkoutDayOptions() {
-            const select = document.getElementById('workout-day-select');
-            select.innerHTML = '';
-            appConfig.dayList.forEach(dayName => {
-                select.innerHTML += `<option value="${dayName}">${dayName}</option>`;
-            });
-            fetchPreviousDayRecord();
-        }
-
-        function promptWeightChange() {
-            const currentW = document.getElementById('dash-weight').innerText.replace(' kg', '');
-            const newW = prompt("선택한 날짜의 체중을 입력하세요 (kg):", currentW !== '--.-' ? currentW : '');
-            if (newW) {
-                document.getElementById('dash-weight').innerText = `${newW} kg`;
-                document.getElementById('input-weight').value = newW;
-            }
-        }
-
-        let timerInterval;
-        function startTimer(seconds) {
-            clearInterval(timerInterval);
-            let left = seconds;
-            const display = document.getElementById('timer-display');
-            timerInterval = setInterval(() => {
-                const m = String(Math.floor(left / 60)).padStart(2, '0');
-                const s = String(left % 60).padStart(2, '0');
-                display.innerText = `${m}:${s}`;
-                if (left <= 0) {
-                    clearInterval(timerInterval);
-                    display.innerText = "완료!";
-                }
-                left--;
-            }, 1000);
-        }
-
-        // 📊 대대적 개편: 세션별 평균 통계 및 계층형 클릭 세부 조회
-        function renderHistorySessions() {
-            const container = document.getElementById('history-sessions-container');
-            container.innerHTML = '';
-
-            const logs = Object.keys(localStorage)
-                .filter(k => k.startsWith('log_'))
-                .map(k => JSON.parse(localStorage.getItem(k)))
-                .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            if (logs.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-500 py-4 text-center">저장된 데이터가 없습니다.</p>';
-                return;
-            }
-
-            const grouped = {};
-            logs.forEach(log => {
-                const sName = log.sessionNum || "세션 1";
-                if (!grouped[sName]) grouped[sName] = [];
-                grouped[sName].push(log);
-            });
-
-            Object.keys(grouped).forEach(sName => {
-                const sLogs = grouped[sName];
-                const avgScore = (sLogs.reduce((acc, l) => acc + (Number(l.score) || 0), 0) / sLogs.length).toFixed(1);
-                const avgWeight = (sLogs.reduce((acc, l) => acc + (Number(l.weight) || 0), 0) / sLogs.length).toFixed(1);
-                const avgKcal = Math.round(sLogs.reduce((acc, l) => acc + calculateKcal(l.carb, l.protein, l.fat), 0) / sLogs.length);
-
-                let dayListHtml = '';
-                sLogs.forEach(l => {
-                    dayListHtml += `
-                        <div onclick="openLogDetail('${l.date}')" class="bg-slate-900 border border-slate-700/80 p-2.5 rounded-lg flex justify-between items-center cursor-pointer hover:border-emerald-500/80 transition-all">
-                            <div>
-                                <p class="font-bold text-emerald-400 text-xs">${l.date} (${l.workoutDay})</p>
-                                <p class="text-[10px] text-slate-400 mt-0.5">체중: ${l.weight || '-'}kg | ${l.rpe || 'RPE-'} ${l.isOverload ? ' | 📈 과부하 성공' : ''}</p>
-                            </div>
-                            <span class="text-xs font-bold text-amber-400">⭐ ${l.score}점</span>
-                        </div>
-                    `;
-                });
-
-                container.innerHTML += `
-                    <div class="bg-slate-800/90 border border-slate-700 p-3.5 rounded-xl space-y-3">
-                        <div class="border-b border-slate-700/80 pb-2">
-                            <h3 class="font-bold text-sm text-emerald-400 flex items-center justify-between">
-                                <span><i class="fa-solid fa-layer-group mr-1.5"></i>${sName} 요약 분석</span>
-                                <span class="text-[10px] text-slate-400">${sLogs.length}개 Day 기록</span>
-                            </h3>
-                            <!-- 세션 평균 통계 바 -->
-                            <div class="grid grid-cols-3 gap-1.5 mt-2.5 text-center text-[10px]">
-                                <div class="bg-slate-900/80 p-1.5 rounded border border-slate-700/50">
-                                    <p class="text-slate-400">평균 컨디션</p>
-                                    <p class="font-bold text-amber-400 text-xs">⭐ ${avgScore}점</p>
-                                </div>
-                                <div class="bg-slate-900/80 p-1.5 rounded border border-slate-700/50">
-                                    <p class="text-slate-400">평균 체중</p>
-                                    <p class="font-bold text-slate-200 text-xs">${avgWeight}kg</p>
-                                </div>
-                                <div class="bg-slate-900/80 p-1.5 rounded border border-slate-700/50">
-                                    <p class="text-slate-400">평균 섭취</p>
-                                    <p class="font-bold text-emerald-400 text-xs">${avgKcal.toLocaleString()}kcal</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 세션 안의 각 Day 기록 클릭 가능한 목록 -->
-                        <div class="space-y-2 pt-1">
-                            <p class="text-[11px] font-bold text-slate-400">포함된 Day 세부 기록 (클릭 시 전체 메모 확인)</p>
-                            ${dayListHtml}
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        // 상세 팝업 오픈
-        function openLogDetail(dateStr) {
-            const l = JSON.parse(localStorage.getItem(`log_${dateStr}`));
-            if (!l) return;
-
-            document.getElementById('detail-modal-title').innerText = `${l.date} (${l.workoutDay}) 상세 기록`;
-            const kcal = calculateKcal(l.carb, l.protein, l.fat);
-
-            document.getElementById('detail-modal-body').innerHTML = `
-                <div class="space-y-2">
-                    <p>⚖️ <strong>체중:</strong> ${l.weight || '-'} kg</p>
-                    <p>🍱 <strong>영양 섭취:</strong> 탄 ${l.carb}g / 단 ${l.protein}g / 지 ${l.fat}g (${kcal.toLocaleString()} kcal)</p>
-                    <p>🏋️ <strong>RPE & 과부하:</strong> ${l.rpe || '-'} ${l.isOverload ? ' (📈 점진적 과부하 성공!)' : ''}</p>
-                    <p>⚡ <strong>운동 전/후 컨디션:</strong> 전 ${l.preCond || 3}단계 / 후 ${l.postCond || 3}단계</p>
-                    <div class="bg-slate-900 p-2.5 rounded border border-slate-700 space-y-1">
-                        <p class="font-bold text-emerald-400">📝 운동 상세 메모:</p>
-                        <p class="whitespace-pre-line text-slate-200">${l.workoutDetails || '운동 상세 메모 없음'}</p>
-                    </div>
-                    <div class="flex space-x-2 pt-2">
-                        <button onclick="editPastLog('${l.date}')" class="w-full bg-emerald-500 text-slate-900 font-bold py-2 rounded">수정하기</button>
-                    </div>
-                </div>
-            `;
-            toggleModal('modal-log-detail');
-        }
-
-        function editPastLog(dateStr) {
-            toggleModal('modal-log-detail');
-            document.getElementById('select-log-date').value = dateStr;
-            loadDateData(dateStr);
-            switchTab('workout');
-            alert(`[${dateStr}] 날짜 데이터를 불러왔습니다. 수정 후 저장해 주세요.`);
-        }
-
-        function renderMeals() {
-            const container = document.getElementById('meals-container');
-            container.innerHTML = '';
-            mealsList.forEach((m) => {
-                container.innerHTML += `
-                    <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-700/80 space-y-2">
-                        <div class="flex justify-between items-center">
-                            <input type="text" value="${m.name}" onchange="updateMealName(${m.id}, this.value)" class="bg-transparent border-b border-slate-700 font-bold text-xs text-emerald-400 focus:outline-none">
-                            <button onclick="removeMealBlock(${m.id})" class="text-slate-500 hover:text-red-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                        <textarea rows="2" placeholder="음식 내용 및 칼로리 메모" onchange="updateMealMemo(${m.id}, this.value)" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-slate-100 placeholder-slate-600 focus:outline-none">${m.memo}</textarea>
-                        <div class="flex items-center space-x-2 pt-1">
-                            <button onclick="startVoiceRecognition(${m.id})" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded flex items-center hover:bg-emerald-500/30">
-                                <i class="fa-solid fa-microphone mr-1"></i>음성으로 입력
-                            </button>
-                            <label class="text-[10px] bg-slate-800 border border-slate-700 px-2.5 py-1 rounded text-slate-300 cursor-pointer flex items-center hover:text-emerald-400">
-                                <i class="fa-solid fa-camera mr-1 text-emerald-400"></i>사진 촬영 / 첨부
-                                <input type="file" accept="image/*" class="hidden" onchange="handleMealImg(${m.id}, this)">
-                            </label>
-                            ${m.img ? `<img src="${m.img}" class="w-8 h-8 rounded object-cover border border-emerald-500/50">` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function addMealBlock() { mealsList.push({ id: Date.now(), name: `식사 ${mealsList.length + 1}`, memo: "", img: "" }); saveMeals(); }
-        function removeMealBlock(id) { mealsList = mealsList.filter(m => m.id !== id); saveMeals(); }
-        function updateMealName(id, val) { const m = mealsList.find(x => x.id === id); if(m) m.name = val; saveMeals(); }
-        function updateMealMemo(id, val) { const m = mealsList.find(x => x.id === id); if(m) m.memo = val; saveMeals(); }
-        
-        function handleMealImg(id, input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const m = mealsList.find(x => x.id === id);
-                    if(m) m.img = e.target.result;
-                    saveMeals();
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function saveMeals() { localStorage.setItem('meals_list', JSON.stringify(mealsList)); renderMeals(); }
-
-        function renderSupps() {
-            const container = document.getElementById('supps-container');
-            container.innerHTML = '';
-            suppsList.forEach((s) => {
-                container.innerHTML += `
-                    <div class="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800">
-                        <label class="flex items-center space-x-2 text-slate-300">
-                            <input type="checkbox" ${s.checked ? 'checked' : ''} onchange="toggleSupp(${s.id})" class="rounded bg-slate-800 border-slate-700 text-emerald-500">
-                            <span>${s.name}</span>
-                        </label>
-                        <button onclick="removeSuppBlock(${s.id})" class="text-slate-600 hover:text-red-400"><i class="fa-solid fa-minus"></i></button>
-                    </div>
-                `;
-            });
-        }
-        function addSuppBlock() { const name = prompt("영양제 이름을 입력하세요:", "비타민 C"); if(name) { suppsList.push({ id: Date.now(), name, checked: false }); saveSupps(); } }
-        function toggleSupp(id) { const s = suppsList.find(x => x.id === id); if(s) s.checked = !s.checked; saveSupps(); }
-        function removeSuppBlock(id) { suppsList = suppsList.filter(s => s.id !== id); saveSupps(); }
-        function saveSupps() { localStorage.setItem('supps_list', JSON.stringify(suppsList)); renderSupps(); }
-
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(localStorage));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `fitness_backup_${new Date().toISOString().split('T')[0]}.json`);
-            dlAnchorElem.click();
-        }
-
-        function importData() {
-            const jsonStr = prompt("백업했던 JSON 데이터 텍스트를 붙여넣으세요:");
-            if (jsonStr) {
-                try {
-                    const parsed = JSON.parse(jsonStr);
-                    Object.keys(parsed).forEach(k => localStorage.setItem(k, parsed[k]));
-                    alert("데이터가 성공적으로 복구되었습니다.");
-                    location.reload();
-                } catch(e) {
-                    alert("올바르지 않은 JSON 데이터입니다.");
-                }
-            }
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('text-emerald-400');
-                el.classList.add('text-slate-400');
-            });
-
-            const targetSection = document.getElementById(`tab-${tabId}`);
-            if(targetSection) targetSection.classList.add('active');
-
-            if(event && event.currentTarget && event.currentTarget.classList) {
-                event.currentTarget.classList.remove('text-slate-400');
-                event.currentTarget.classList.add('text-emerald-400');
-            }
-
-            if(tabId === 'history') renderHistorySessions();
-        }
-
-        function updateNutrientBars() {
-            const carb = Number(document.getElementById('input-carb').value) || 0;
-            const protein = Number(document.getElementById('input-protein').value) || 0;
-            const fat = Number(document.getElementById('input-fat').value) || 0;
-
-            const tCarb = Number(appConfig.carb) || 270;
-            const tProtein = Number(appConfig.protein) || 160;
-            const tFat = Number(appConfig.fat) || 60;
-
-            const currKcal = calculateKcal(carb, protein, fat);
-            document.getElementById('lbl-curr-kcal').innerText = `현재 섭취 칼로리: ${currKcal.toLocaleString()} kcal`;
-
-            document.getElementById('carb-status').innerText = `${carb}g / ${tCarb}g`;
-            document.getElementById('protein-status').innerText = `${protein}g / ${tProtein}g`;
-            document.getElementById('fat-status').innerText = `${fat}g / ${tFat}g`;
-
-            document.getElementById('carb-bar').style.width = `${Math.min((carb / tCarb) * 100, 100)}%`;
-            document.getElementById('protein-bar').style.width = `${Math.min((protein / tProtein) * 100, 100)}%`;
-            document.getElementById('fat-bar').style.width = `${Math.min((fat / tFat) * 100, 100)}%`;
-        }
-
-        ['input-carb', 'input-protein', 'input-fat'].forEach(id => {
-            document.getElementById(id).addEventListener('input', updateNutrientBars);
-        });
-
-        document.getElementById('input-score').addEventListener('input', (e) => {
-            document.getElementById('score-display').innerText = `${e.target.value} 점`;
-        });
-
-        document.getElementById('btn-save').addEventListener('click', () => {
-            const targetDateStr = document.getElementById('select-log-date').value;
-            const data = {
-                date: targetDateStr,
-                weight: document.getElementById('input-weight').value,
-                score: document.getElementById('input-score').value,
-                carb: document.getElementById('input-carb').value,
-                protein: document.getElementById('input-protein').value,
-                fat: document.getElementById('input-fat').value,
-                sessionNum: document.getElementById('workout-session-num').value,
-                workoutDay: document.getElementById('workout-day-select').value,
-                rpe: document.getElementById('workout-rpe').value,
-                workoutDetails: document.getElementById('workout-details').value,
-                isOverload: document.getElementById('chk-overload').checked,
-                preCond: selectedPreCond,
-                postCond: selectedPostCond
-            };
-
-            localStorage.setItem(`log_${targetDateStr}`, JSON.stringify(data));
-            
-            document.getElementById('dash-score').innerText = `⭐ ${data.score} / 10`;
-            document.getElementById('dash-weight').innerText = `${data.weight} kg`;
-            updateNutrientBars();
-
-            alert(`[${targetDateStr}] 데이터가 성공적으로 저장되었습니다.`);
-            switchTab('dashboard');
-        });
-
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('select-log-date').value = todayStr;
-
-        applyAppConfig();
-        renderWorkoutDayOptions();
-        renderMeals();
-        renderSupps();
-        loadDateData(todayStr);
-        setPreCond(3);
-        setPostCond(3);
-    </script>
-</body>
-</html>
+                <div class="grid grid-
